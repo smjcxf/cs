@@ -1,4 +1,4 @@
-name: Download github-chinese branches
+name: Download github-chinese branches2
 
 on:
   # 可以根据需要调整触发条件，比如 push 到 main 分支
