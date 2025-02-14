@@ -1,0 +1,28 @@
+name: Sync External Repo Branches
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每天凌晨 0 点运行
+  workflow_dispatch: # 也可以手动触发
+
+jobs:
+  sync - branches:
+    runs-on: ubuntu - latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Git
+        run: |
+          sudo apt - get update
+          sudo apt - get install - y git
+      - name: Clone External Repo with All Branches
+        env:
+          EXTERNAL_REPO_URL: https://github.com/lushunming/AndroidCatVodSpider # 替换为你要下载的仓库 URL
+          LOCAL_DIR: AndroidCatVodSpider # 本地保存的目录名
+        run: |
+          mkdir -p $LOCAL_DIR
+          cd $LOCAL_DIR
+          git clone --mirror $EXTERNAL_REPO_URL.
+          git for - each - ref --format='%(refname:short)' refs/remotes/origin | while read branch; do
+            mkdir -p $branch
+            git --work - tree=$branch --git - dir=. checkout - f $branch
+          done
