@@ -67,5 +67,5 @@ jobs:
       - name: Upload Cross Compile Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ysptp_windows_amd64
+          name: ysptp_windows_amd64.exe
           path: ysptp_windows_amd64.exe
