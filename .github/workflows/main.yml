@@ -38,5 +38,5 @@ jobs:
           git add .
           git commit -m "Downloaded github-chinese branches" || true
           # 添加远程仓库信息和访问令牌
-          git remote set-url origin https://${{ secrets.PAT }}@github.com/maboloshi/github-chinese.git
+          git remote set-url origin https://${{ secrets.GITHUB_TOKEN }}@github.com/maboloshi/github-chinese.git
           git push origin main
