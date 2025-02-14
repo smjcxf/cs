@@ -12,7 +12,7 @@ jobs:
         run: |
           GOOS=linux GOARCH=amd64 go build -o ysptp_linux_amd64
       - name: Upload Cross Compile Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ysptp_linux_amd64
           path: ysptp_linux_amd64
@@ -25,7 +25,7 @@ jobs:
         run: |
           GOOS=linux GOARCH=arm64 go build -o ysptp_linux_arm64
       - name: Upload Cross Compile Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ysptp_linux_arm64
           path: ysptp_linux_arm64
@@ -65,7 +65,7 @@ jobs:
         run: |
           GOOS=windows GOARCH=amd64 go build -o ysptp_windows_amd64.exe
       - name: Upload Cross Compile Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ysptp_windows_amd64
           path: ysptp_windows_amd64.exe
