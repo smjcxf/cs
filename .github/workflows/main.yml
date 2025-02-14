@@ -1,24 +1,41 @@
-name: Sync Upstream
-on:
-  schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+#!/bin/bash
 
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+# 克隆你自己的仓库到本地
+git clone https://github.com/smjcxf/cs.git
+cd cs
 
-      - name: Sync upstream
-        run: |
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'actions@github.com'
-          git remote add upstream https://github.com/maboloshi/github-chinese.git
-          git fetch upstream
-          git checkout gh-pages
-          git merge upstream/gh-pages
-          git push https://${{ secrets.PAT }}@github.com/smjcxf/cs.git gh-pages
+# 切换到 main 分支
+git checkout main
+
+# 克隆 github-chinese 仓库到临时目录
+git clone --bare https://github.com/maboloshi/github-chinese.git github-chinese-tmp
+
+# 获取所有分支名称
+branches=$(git --git-dir=github-chinese-tmp/.git branch -a | grep -v HEAD | sed 's/^..//')
+
+# 创建 github-chinese 文件夹
+mkdir -p github-chinese
+
+# 遍历每个分支
+for branch in $branches; do
+    # 提取分支名
+    branch_name=$(echo $branch | sed 's/^remotes\/origin\///')
+    
+    # 创建以分支名命名的文件夹
+    mkdir -p github-chinese/$branch_name
+    
+    # 克隆指定分支到对应的文件夹
+    git clone --branch $branch_name --depth 1 https://github.com/maboloshi/github-chinese.git github-chinese/$branch_name
+done
+
+# 删除临时目录
+rm -rf github-chinese-tmp
+
+# 添加更改到暂存区
+git add .
+
+# 提交更改
+git commit -m "Download all branches of github-chinese"
+
+# 推送更改到远程仓库
+git push origin main
