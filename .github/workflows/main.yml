@@ -1,26 +1,32 @@
-name: Sync Upstream  # 工作流名称
+name: My Workflow
 
 on:
-  schedule:
-    - cron: '0 * * * *'  # 每小时运行一次的定时器
-  workflow_dispatch:  # 通过手动触发运行工作流
+  push:
+    branches:
+      - main
 
 jobs:
-  sync:
-    runs-on: ubuntu-latest  # 在最新版的 Ubuntu 环境中运行
+  build:
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code  # 步骤名称：检出代码
-      uses: actions/checkout@v2  # 使用 GitHub 提供的 actions/checkout 操作
-      with:
-        fetch-depth: 0  # 获取所有历史提交
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Sync upstream  # 步骤名称：同步上游
-      run: |
-        git config --global user.name 'GitHub Actions'  # 设置 Git 用户名
-        git config --global user.email 'actions@github.com'  # 设置 Git 用户邮箱
-        git remote add upstream https://github.com/maboloshi/github-chinese.git  # 添加上游仓库
-        git fetch upstream  # 获取上游仓库最新更改
-        git checkout gh-pages  # 切换到本地主分支
-        git merge upstream/gh-pages  # 合并上游仓库的主分支到本地主分支
-        git push https://${{ secrets.PAT }}@github.com/smjcxf/cs.git gh-pages  # 使用个人访问令牌推送代码
+      - name: Set Git username
+        run: git config --global user.name 'GitHub Actions'
+
+      - name: Set Git email
+        run: git config --global user.email 'actions@github.com'
+
+      - name: Pull and switch branch
+        run: |
+          git remote add upstream https://github.com/maboloshi/github-chinese
+          git fetch upstream
+          git checkout -b gh-pages upstream/gh-pages
+
+      - name: Push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}  # PAT 是在 GitHub 仓库的 Secrets 中添加的令牌名称
+        run: |
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/smjcxf/cs.git gh-pages
