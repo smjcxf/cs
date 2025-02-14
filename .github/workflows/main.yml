@@ -1,30 +1,45 @@
-name: Download Repository
+name: Fork & Edit
+# 2024-02-28 08:33
+
+
 
 on:
-  # 可以根据需要设置触发条件，这里设置为手动触发
   workflow_dispatch:
-
+  schedule:
+    - cron: "30 * * * *"
+  
 jobs:
-  download-repo:
+  Fork-FLITER-list:
     runs-on: ubuntu-latest
+    env:
+      TZ: 'Asia/Shanghai'
+    
+    steps: 
+    - name: Checkout target repository
+      uses: actions/checkout@v4.1.0
+      with:
+        repository: smjcxf/cvwt
+        path: cvwt-repo
 
-    steps:
-      - name: Checkout this repository
-        uses: actions/checkout@v3
+######
+    - name: Download files to GeoIP
+      run: |
+        
+        curl -L -o cvwt-repo/Country.mmdb "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-Country.mmdb"
 
-      - name: Download target repository
-        run: |
-          # 设置目标仓库的 URL
-          TARGET_REPO_URL="https://github.com/bingotang1981/iptv.git"
-          # 设置下载目录
-          DOWNLOAD_DIR="downloaded-repo"
-          # 克隆目标仓库到指定目录
-          git clone $TARGET_REPO_URL $DOWNLOAD_DIR
-
-      - name: Commit and push changes
-        run: |
-          git config --global user.name "Your Name"
-          git config --global user.email "your_email@example.com"
+        cd cvwt-repo
+        if [[ -n $(git status -s) ]]; then
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git add .
-          git commit -m "Downloaded target repository"
-          git push
+          git commit -m "Auto Update $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M')"
+          git push origin HEAD
+        else
+          echo "No changes to commit."
+        fi
+
+    - name: Cleanup Workflow
+      uses: Mattraks/delete-workflow-runs@main
+      with:
+        retain_days: 0
+        keep_minimum_runs: 2
