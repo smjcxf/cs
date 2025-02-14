@@ -1,42 +1,26 @@
-name: Download github-chinese branches2
+name: Sync Upstream  # 工作流名称
 
 on:
-  # 可以根据需要调整触发条件，比如 push 到 main 分支
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: '0 * * * *'  # 每小时运行一次的定时器
+  workflow_dispatch:  # 通过手动触发运行工作流
 
 jobs:
-  download-branches:
-    runs-on: ubuntu-latest
+  sync:
+    runs-on: ubuntu-latest  # 在最新版的 Ubuntu 环境中运行
 
     steps:
-      - name: Checkout this repository
-        uses: actions/checkout@v2
+    - name: Checkout code  # 步骤名称：检出代码
+      uses: actions/checkout@v2  # 使用 GitHub 提供的 actions/checkout 操作
+      with:
+        fetch-depth: 0  # 获取所有历史提交
 
-      - name: Set up Git
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-
-      - name: Clone github-chinese repository
-        run: |
-          mkdir -p github-chinese
-          cd github-chinese
-          git clone --mirror https://github.com/maboloshi/github-chinese.git .git
-
-      - name: Create folders for each branch and checkout
-        run: |
-          cd github-chinese
-          for branch in $(git branch -r | grep -v 'HEAD' | grep -v 'origin/HEAD' | sed 's/origin\///'); do
-            mkdir -p $branch
-            git --work-tree=$branch checkout $branch
-          done
-
-      - name: Commit and push changes
-        run: |
-          git add .
-          git commit -m "Downloaded github-chinese branches" || true
-          # 添加远程仓库信息和访问令牌
-          git remote set-url origin https://${{ secrets.GITHUB_TOKEN }}@github.com/maboloshi/github-chinese.git
-          git push origin main
+    - name: Sync upstream  # 步骤名称：同步上游
+      run: |
+        git config --global user.name 'GitHub Actions'  # 设置 Git 用户名
+        git config --global user.email 'actions@github.com'  # 设置 Git 用户邮箱
+        git remote add upstream https://github.com/maboloshi/github-chinese.git  # 添加上游仓库
+        git fetch upstream  # 获取上游仓库最新更改
+        git checkout gh-pages  # 切换到本地主分支
+        git merge upstream/gh-pages  # 合并上游仓库的主分支到本地主分支
+        git push origin gh-pages  # 将本地主分支推送到远程仓库
