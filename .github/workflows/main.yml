@@ -23,4 +23,4 @@ jobs:
         git fetch upstream  # 获取上游仓库最新更改
         git checkout gh-pages  # 切换到本地主分支
         git merge upstream/gh-pages  # 合并上游仓库的主分支到本地主分支
-        git push origin gh-pages  # 将本地主分支推送到远程仓库
+        git push https://${{ secrets.PAT }}@github.com/smjcxf/cs.git gh-pages  # 使用个人访问令牌推送代码
