@@ -1,0 +1,71 @@
+name: IPTV-Go
+
+on:
+  workflow_dispatch:  # 允许手动执行
+
+jobs:
+  linux_amd64_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cross Compile
+        run: |
+          GOOS=linux GOARCH=amd64 go build -o ysptp_linux_amd64
+      - name: Upload Cross Compile Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ysptp_linux_amd64
+          path: ysptp_linux_amd64
+
+  linux_arm64_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cross Compile
+        run: |
+          GOOS=linux GOARCH=arm64 go build -o ysptp_linux_arm64
+      - name: Upload Cross Compile Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ysptp_linux_arm64
+          path: ysptp_linux_arm64
+
+  freebsd_amd64_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cross Compile
+        run: |
+          GOOS=freebsd GOARCH=amd64 go build -o ysptp_freebsd_amd64
+      - name: Upload Cross Compile Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ysptp_freebsd_amd64
+          path: ysptp_freebsd_amd64
+
+  linux_mipsle_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cross Compile
+        run: |
+          GOOS=linux GOARCH=mipsle go build -o ysptp_linux_mipsle
+      - name: Upload Cross Compile Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ysptp_linux_mipsle
+          path: ysptp_linux_mipsle
+
+  
+  windows_amd64_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cross Compile
+        run: |
+          GOOS=windows GOARCH=amd64 go build -o ysptp_windows_amd64.exe
+      - name: Upload Cross Compile Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ysptp_windows_amd64
+          path: ysptp_windows_amd64.exe
