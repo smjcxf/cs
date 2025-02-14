@@ -1,32 +1,24 @@
-name: My Workflow
-
+name: Sync Upstream
 on:
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
-  build:
+  sync:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-      - name: Set Git username
-        run: git config --global user.name 'GitHub Actions'
-
-      - name: Set Git email
-        run: git config --global user.email 'actions@github.com'
-
-      - name: Pull and switch branch
+      - name: Sync upstream
         run: |
-          git remote add upstream https://github.com/maboloshi/github-chinese
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git remote add upstream https://github.com/maboloshi/github-chinese.git
           git fetch upstream
-          git checkout -b gh-pages upstream/gh-pages
-
-      - name: Push changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}  # PAT 是在 GitHub 仓库的 Secrets 中添加的令牌名称
-        run: |
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/smjcxf/cs.git gh-pages
+          git checkout gh-pages
+          git merge upstream/gh-pages
+          git push https://${{ secrets.PAT }}@github.com/smjcxf/cs.git gh-pages
